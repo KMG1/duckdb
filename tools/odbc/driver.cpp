@@ -205,6 +205,13 @@ static SQLRETURN SetConnection(SQLHDBC connection_handle, SQLCHAR *conn_str) {
 	dbc->SetDatabaseName(db_name);
 	db_name = dbc->GetDatabaseName();
 
+    // set read-only (if specified)
+    string read_only;
+    OdbcUtils::SetValueFromConnStr(conn_str, "ReadOnly", read_only);
+    if (read_only == "True") {
+        dbc->sql_attr_access_mode = SQL_MODE_READ_ONLY;
+    }
+
 	if (!db_name.empty()) {
 		duckdb::DBConfig config;
 		if (dbc->sql_attr_access_mode == SQL_MODE_READ_ONLY) {
